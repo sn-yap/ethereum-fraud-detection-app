@@ -4,6 +4,7 @@ import pandas as pd
 import numpy as np
 from io import StringIO
 import csv
+import matplotlib.pyplot as plt
 
 
 # Define the base path
@@ -379,3 +380,83 @@ with tab5:
 
     else:
         st.write("Please upload your data in the 'Data Upload' tab.")
+
+
+# Content for Tab 6 - Model Performance
+with tab6:
+    st.header("Model Performance")
+    st.write("Visualizing model performance.")
+
+    # Load the results DataFrame from the CSV file
+    results_df = pd.read_csv('results_original.csv')
+
+    st.write(results_df)
+
+    # Abbreviations for model names
+    abbreviation_mapping = {
+        "Support Vector Classifier": "SVC",
+        "Random Forest Classifier": "RF",
+        "Gradient Boosting Classifier": "GB"
+    }
+
+    # Replace model names with abbreviations
+    results_df['Model'] = results_df['Model'].map(abbreviation_mapping)
+
+    # Train and Test Accuracy plot
+    with st.expander("Train and Test Accuracy"):
+        fig, ax = plt.subplots(figsize=(10, 6))
+        results_df[['Model', 'Train Accuracy', 'Test Accuracy']].set_index('Model').plot(kind='bar', ax=ax)
+        ax.set_ylabel('Accuracy')
+        ax.set_title('Train and Test Accuracy')
+        ax.legend(['Train Accuracy', 'Test Accuracy'])
+        ax.set_xticklabels(results_df['Model'], rotation=0)  # Adjust the rotation angle as needed
+        st.pyplot(fig)
+
+
+    # Precision, Recall, and F1-Score plot
+    with st.expander("Precision, Recall, and F1-Score"):
+        fig, ax = plt.subplots(figsize=(10, 6))
+        bar_width = 0.15
+        metrics = ['Precision_0', 'Recall_0', 'F1_0', 'Precision_1', 'Recall_1', 'F1_1']
+        for i, metric in enumerate(metrics):
+            x = np.arange(len(results_df))
+            ax.bar(x + i * bar_width, results_df[metric], width=bar_width, label=metric)
+        ax.set_xlabel('Model')
+        ax.set_ylabel('Score')
+        ax.set_title('Precision, Recall, and F1-Score')
+        ax.set_xticks(np.arange(len(results_df)) + bar_width * (len(metrics) - 1) / 2)
+        ax.set_xticklabels(results_df['Model'])
+        ax.legend()
+        st.pyplot(fig)
+
+
+    # Confusion Matrix Heatmaps
+    with st.expander("Confusion Matrices"):
+        num_models = len(results_df)
+        columns = st.columns(num_models)
+        for idx, row in results_df.iterrows():
+            cm = np.array([[row['True Positive'], row['False Positive']],
+                           [row['False Negative'], row['True Negative']]])
+            fig, ax = plt.subplots()
+            cax = ax.matshow(cm, cmap='Blues')
+            plt.colorbar(cax)
+            for (i, j), val in np.ndenumerate(cm):
+                ax.text(j, i, f'{val}', ha='center', va='center', color='black')
+            ax.set_xticklabels(['', 'Predicted Positive', 'Predicted Negative'])
+            ax.set_yticklabels(['', 'Actual Positive', 'Actual Negative'])
+            ax.set_xlabel('Predicted')
+            ax.set_ylabel('Actual')
+            ax.set_title(f'Confusion Matrix\n{row["Model"]}')
+            with columns[idx]:
+                st.pyplot(fig)
+
+
+    # ROC AUC plot
+    with st.expander("ROC AUC"):
+        fig, ax = plt.subplots(figsize=(10, 6))
+        ax.bar(results_df['Model'], results_df['ROC AUC'])
+        ax.set_xlabel('Model')
+        ax.set_ylabel('ROC AUC')
+        ax.set_title('ROC AUC')
+        ax.set_xticklabels(results_df['Model'], rotation=0)
+        st.pyplot(fig)
