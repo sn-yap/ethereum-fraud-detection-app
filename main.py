@@ -21,8 +21,8 @@ st.title(
 
 
 # Define the tabs
-tab1, tab2, tab3, tab4, tab5 = st.tabs(
-    ["Home", "Data Upload", "Data Preprocessing", "Fraud Prediction", "Insights and Actions"])
+tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs(
+    ["Home", "Data Upload", "Data Preprocessing", "Fraud Prediction", "Insights and Actions", "Model Performance"])
 
 
 # Content for Tab 1 - Home
@@ -55,6 +55,11 @@ with tab1:
     - Access detailed reports and visualizations to understand the characteristics of fraudulent transactions.
     - Use the insights to develop strategies for enhancing security measures and preventing fraudulent activities.
     - Export the results for further analysis or integration with existing fraud detection systems.
+
+    ##### Model Performance
+    - Evaluate the performance of machine learning models in detecting fraudulent transactions.
+    - Explore metrics such as accuracy, precision, recall, F1-score, and ROC AUC to assess the effectiveness of each model.
+    - Use visualizations to compare the performance of different models and identify the most suitable approach for fraud detection.
 
     #### Disclaimer
     The predictions and insights provided by our application are based on the data supplied by users and the performance of our machine learning models. 
