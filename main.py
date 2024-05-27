@@ -7,15 +7,15 @@ import sys
 from pathlib import Path
 import csv
 
-# Get the directory of the current script
-dir = path.Path(__file__).abspath()
-sys.append.path(dir.parent.parent)
+# Define the base path
+base_path = "./"
 
 # Load the preprocessor pipeline and the models
-preprocessor_path = './preprocessor.joblib'
-svc_model_path = './Support Vector Classifier_original.joblib'
-gb_model_path = './Gradient Boosting Classifier_original.joblib'
-rf_model_path = './Random Forest Classifier_original.joblib'
+preprocessor = joblib.load(base_path + 'preprocessor.joblib')
+svc_model = joblib.load(base_path + 'Support Vector Classifier_original.joblib')
+gb_model = joblib.load(base_path + 'Gradient Boosting Classifier_original.joblib')
+rf_model = joblib.load(base_path + 'Random Forest Classifier_original.joblib')
+
 
 # Load the preprocessor and models
 preprocessor = joblib.load(preprocessor_path)
