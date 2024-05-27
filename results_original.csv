@@ -1,0 +1,4 @@
+Model,Train Accuracy,Test Accuracy,Precision_0,Recall_0,F1_0,Precision_1,Recall_1,F1_1,Overall Accuracy,True Positive,True Negative,False Positive,False Negative,ROC AUC
+Support Vector Classifier,0.707,0.706,0.979,0.651,0.782,0.387,0.941,0.548,0.706,254,752,403,16,0.926
+Gradient Boosting Classifier,0.956,0.952,0.984,0.957,0.97,0.834,0.933,0.881,0.952,252,1105,50,18,0.99
+Random Forest Classifier,0.999,0.961,0.981,0.971,0.976,0.879,0.919,0.899,0.961,248,1121,34,22,0.99
