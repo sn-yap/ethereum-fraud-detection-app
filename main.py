@@ -4,13 +4,14 @@ import pandas as pd
 import numpy as np
 from io import StringIO
 import csv
-# from sklearn.metrics import accuracy_score, classification_report, plot_confusion_matrix, plot_roc_curve
+# import sys
+# import path
 
 # Load the preprocessor pipeline and the models
-preprocessor = joblib.load('preprocessor.joblib')
-svc_model = joblib.load('Support Vector Classifier_original.joblib')
-gb_model = joblib.load('Random Forest Classifier_original.joblib')
-rf_model = joblib.load('Random Forest Classifier_original.joblib')
+preprocessor = joblib.load('./preprocessor.joblib')
+svc_model = joblib.load('./Support Vector Classifier_original.joblib')
+gb_model = joblib.load('./Random Forest Classifier_original.joblib')
+rf_model = joblib.load('./Random Forest Classifier_original.joblib')
 
 st.title(
     "Machine Learning Defends Against Ethereum Fraud")
