@@ -82,6 +82,7 @@ with tab2:
 
     # Sample template data
     template_data = {
+        "Index": [],
         "time_diff_between_first_and_last_(mins)": [],
         "min_value_received": [],
         "min_value_sent_to_contract": [],
@@ -93,7 +94,7 @@ with tab2:
         "erc20_uniq_rec_contract_addr": []
     }
 
-    relevant_columns = list(template_data.keys())
+    relevant_columns = list(template_data.keys())[1:]  # Exclude the "Index" column
 
     def generate_template_csv():
         output = StringIO()
@@ -154,7 +155,7 @@ with tab2:
             # Store the data in the session state
             st.session_state['uploaded_data'] = df
             st.write("Data submitted successfully!")
-            st.write(df)
+            # st.write(df)
 
     else:
         uploaded_file = st.file_uploader("Choose a file", type=['csv', 'xlsx'])
@@ -169,14 +170,14 @@ with tab2:
             # Convert column names to snake case
             df.columns = df.columns.str.strip().str.lower().str.replace(' ', '_')
 
-            st.write(df.columns)
+            # st.write(df.columns)
 
             # Filter the columns to keep only the required ones
             df = df[relevant_columns]
 
             st.session_state['uploaded_data'] = df
             st.write("File uploaded successfully!")
-            st.write(df)
+            # st.write(df)
 
 
 # Content for Tab 3 - Data Preprocessing
