@@ -3,15 +3,25 @@ import joblib
 import pandas as pd
 import numpy as np
 from io import StringIO
+import sys
+import path
 import csv
-# import sys
-# import path
+
+# Get the directory of the current script
+dir = path.Path(__file__).abspath()
+sys.append.path(dir.parent.parent)
 
 # Load the preprocessor pipeline and the models
-preprocessor = joblib.load('./preprocessor.joblib')
-svc_model = joblib.load('./Support Vector Classifier_original.joblib')
-gb_model = joblib.load('./Random Forest Classifier_original.joblib')
-rf_model = joblib.load('./Random Forest Classifier_original.joblib')
+preprocessor_path = './preprocessor.joblib'
+svc_model_path = './Support Vector Classifier_original.joblib'
+gb_model_path = './Gradient Boosting Classifier_original.joblib'
+rf_model_path = './Random Forest Classifier_original.joblib'
+
+# Load the preprocessor and models
+preprocessor = joblib.load(preprocessor_path)
+svc_model = joblib.load(svc_model_path)
+gb_model = joblib.load(gb_model_path)
+rf_model = joblib.load(rf_model_path)
 
 st.title(
     "Machine Learning Defends Against Ethereum Fraud")
