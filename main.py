@@ -223,6 +223,9 @@ with tab4:
         rf_predictions = rf_model.predict(df)
 
         if (len(df) == 1):
+            # Counter for the number of positive predictions
+            positive_predictions_counter = 0
+
             # Create a row layout to display predictions side by side
             col1, col2, col3 = st.columns(3)
 
@@ -233,6 +236,7 @@ with tab4:
                     st.success("Transaction appears legitimate.")
                 else:
                     st.error("Alert: High fraud probability!")
+                    positive_predictions_counter += 1
 
             # Display GBC prediction
             with col2:
@@ -241,6 +245,7 @@ with tab4:
                     st.success("Transaction appears legitimate.")
                 else:
                     st.error("Alert: High fraud probability!")
+                    positive_predictions_counter += 1
 
             # Display RFC prediction
             with col3:
@@ -249,16 +254,13 @@ with tab4:
                     st.success("Transaction appears legitimate.")
                 else:
                     st.error("Alert: High fraud probability!")
+                    positive_predictions_counter += 1
 
-            # Combine predictions and determine the majority vote
-            final_predictions = np.argmax(np.array([svc_predictions, gb_predictions, rf_predictions]), axis=0)
-
-            # Display the final prediction outcome for each row
-            for i, pred in enumerate(final_predictions):
-                if pred == 0:
-                    st.success("The majority vote indicates that this transaction appears legitimate.")
-                else:
-                    st.error("Alert: The majority vote indicates a high probability of fraud for this transaction.")
+            # Determine the final prediction based on the majority vote
+            if positive_predictions_counter > 1:
+                st.error("Alert: The majority vote indicates a high probability of fraud for this transaction.")
+            else:
+                st.success("The majority vote indicates that this transaction appears legitimate.")
 
         else:
             # Append predictions to the DataFrame
@@ -283,7 +285,6 @@ with tab4:
                 mime='text/csv',
             )
 
-
     else:
         st.write("Please upload your data in the 'Data Upload' tab.")
 
@@ -298,5 +299,83 @@ with tab5:
         # Example report (you can replace this with your actual report logic)
         st.write("**Summary Statistics**")
         st.write(df.describe())
+
+        # Distribution of Time Differences
+        with st.expander("Distribution of Time Differences"):
+            fig, ax = plt.subplots()
+            ax.hist(df['time_diff_between_first_and_last_(mins)'], bins=50, edgecolor='black')
+            ax.set_title('Distribution of Time Differences (mins)')
+            ax.set_xlabel('Time Difference (mins)')
+            ax.set_ylabel('Frequency')
+            st.pyplot(fig)
+
+        # Min and Max Value Sent/Received
+        with st.expander("Min and Max Value Sent/Received"):
+            fig, ax = plt.subplots(1, 3, figsize=(18, 6))
+
+            ax[0].hist(df['min_value_received'], bins=50, edgecolor='black')
+            ax[0].set_title('Min Value Received')
+            ax[0].set_xlabel('Min Value Received')
+            ax[0].set_ylabel('Frequency')
+
+            ax[1].hist(df['min_value_sent_to_contract'], bins=50, edgecolor='black')
+            ax[1].set_title('Min Value Sent to Contract')
+            ax[1].set_xlabel('Min Value Sent to Contract')
+            ax[1].set_ylabel('Frequency')
+
+            ax[2].hist(df['max_val_sent_to_contract'], bins=50, edgecolor='black')
+            ax[2].set_title('Max Value Sent to Contract')
+            ax[2].set_xlabel('Max Value Sent to Contract')
+            ax[2].set_ylabel('Frequency')
+
+            st.pyplot(fig)
+
+        # Total Ether Sent vs. Received
+        with st.expander("Total Ether Sent vs. Received"):
+            fig, ax = plt.subplots()
+            ax.scatter(df['total_ether_sent'], df['total_ether_received'], alpha=0.5)
+            ax.set_title('Total Ether Sent vs. Received')
+            ax.set_xlabel('Total Ether Sent')
+            ax.set_ylabel('Total Ether Received')
+            st.pyplot(fig)
+
+        # Ether Balance Analysis
+        with st.expander("Ether Balance Analysis"):
+            fig, ax = plt.subplots()
+            ax.hist(df['total_ether_balance'], bins=50, edgecolor='black')
+            ax.set_title('Ether Balance Distribution')
+            ax.set_xlabel('Total Ether Balance')
+            ax.set_ylabel('Frequency')
+            st.pyplot(fig)
+
+        # Unique ERC20 Sent and Received Addresses
+        with st.expander("Unique ERC20 Sent and Received Addresses"):
+            fig, ax = plt.subplots(1, 2, figsize=(12, 6))
+
+            ax[0].hist(df['erc20_uniq_sent_addr.1'], bins=50, edgecolor='black')
+            ax[0].set_title('Unique ERC20 Sent Addresses')
+            ax[0].set_xlabel('Unique ERC20 Sent Addresses')
+            ax[0].set_ylabel('Frequency')
+
+            ax[1].hist(df['erc20_uniq_rec_contract_addr'], bins=50, edgecolor='black')
+            ax[1].set_title('Unique ERC20 Received Contract Addresses')
+            ax[1].set_xlabel('Unique ERC20 Received Contract Addresses')
+            ax[1].set_ylabel('Frequency')
+
+            st.pyplot(fig)
+
+        # Correlation Heatmap
+        with st.expander("Correlation Heatmap"):
+            fig, ax = plt.subplots(figsize=(10, 8))
+            corr = df.corr()
+            cax = ax.matshow(corr, cmap='coolwarm')
+            fig.colorbar(cax)
+            ax.set_xticks(np.arange(len(corr.columns)))
+            ax.set_yticks(np.arange(len(corr.columns)))
+            ax.set_xticklabels(corr.columns, rotation=90)
+            ax.set_yticklabels(corr.columns)
+            ax.set_title('Correlation Heatmap')
+            st.pyplot(fig)
+
     else:
         st.write("Please upload your data in the 'Data Upload' tab.")
