@@ -3,9 +3,8 @@ import joblib
 import pandas as pd
 import numpy as np
 from io import StringIO
-import sys
-from pathlib import Path
 import csv
+
 
 # Define the base path
 base_path = "./"
@@ -17,18 +16,14 @@ gb_model = joblib.load(base_path + 'Gradient Boosting Classifier_original.joblib
 rf_model = joblib.load(base_path + 'Random Forest Classifier_original.joblib')
 
 
-# Load the preprocessor and models
-preprocessor = joblib.load(preprocessor_path)
-svc_model = joblib.load(svc_model_path)
-gb_model = joblib.load(gb_model_path)
-rf_model = joblib.load(rf_model_path)
-
 st.title(
     "Machine Learning Defends Against Ethereum Fraud")
+
 
 # Define the tabs
 tab1, tab2, tab3, tab4, tab5 = st.tabs(
     ["Home", "Data Upload", "Data Preprocessing", "Fraud Prediction", "Insights and Actions"])
+
 
 # Content for Tab 1 - Home
 with tab1:
@@ -51,7 +46,7 @@ with tab1:
     - The application will preprocess the uploaded data, handling missing values and normalizing the data as needed.
     - Review the preprocessed data summary to ensure accuracy.
 
-    ##### Churn Prediction
+    ##### Fraud Prediction
     - Initiate the fraud prediction process.
     - The application will apply machine learning algorithms to detect anomalies and flag potentially fraudulent transactions.
     - Review the prediction results, which will include labels indicating suspicious transactions.
@@ -70,6 +65,7 @@ with tab1:
     Thank you for choosing our Ethereum Fraud Detection Web Application to strengthen security and combat fraudulent activities on the Ethereum network. 
     Together, we can uphold the integrity of decentralized finance and blockchain technology.
     """)
+
 
 # Content for Tab 2 - Data Upload
 with tab2:
@@ -93,7 +89,6 @@ with tab2:
     }
 
     relevant_columns = list(template_data.keys())
-
 
     def generate_template_csv():
         output = StringIO()
@@ -160,9 +155,16 @@ with tab2:
         uploaded_file = st.file_uploader("Choose a file", type=['csv', 'xlsx'])
         if uploaded_file is not None:
             if uploaded_file.name.endswith('.csv'):
-                df = pd.read_csv(uploaded_file)
+                df = pd.read_csv(uploaded_file, index_col=0)
             elif uploaded_file.name.endswith('.xlsx'):
                 df = pd.read_excel(uploaded_file)
+
+            st.write(df)
+
+            # Convert column names to snake case
+            df.columns = df.columns.str.strip().str.lower().str.replace(' ', '_')
+
+            st.write(df.columns)
 
             # Filter the columns to keep only the required ones
             df = df[relevant_columns]
@@ -170,6 +172,7 @@ with tab2:
             st.session_state['uploaded_data'] = df
             st.write("File uploaded successfully!")
             st.write(df)
+
 
 # Content for Tab 3 - Data Preprocessing
 with tab3:
@@ -194,13 +197,13 @@ with tab3:
 
         # Preprocess the data using the preprocessor pipeline and display the result
         st.write("**Preprocessed Data**")
-        preprocessed_data = preprocessor.transform(df_num)
-        st.write(preprocessed_data)
+        preprocessed_df = preprocessor.transform(df_num)
+        st.write(preprocessed_df)
     else:
         st.write("Please upload your data in the 'Data Upload' tab.")
 
 
-# Content for Tab 4 - Churn Prediction
+# Content for Tab 4 - Fraud Prediction
 with tab4:
     st.header("Fraud Prediction")
     st.write("Upload your data to predict fraudulent transactions.")
@@ -213,75 +216,81 @@ with tab4:
         gb_predictions = gb_model.predict(df)
         rf_predictions = rf_model.predict(df)
 
-        # Create a row layout to display predictions side by side
-        col1, col2, col3 = st.columns(3)
+        if (len(df) == 1):
+            # Create a row layout to display predictions side by side
+            col1, col2, col3 = st.columns(3)
 
-        # Display SVC prediction
-        with col1:
-            st.write("**Support Vector Classifier Prediction:**")
-            if svc_predictions == 0:
-                st.success("Transaction appears legitimate.")
-            else:
-                st.error("Alert: High fraud probability!")
+            # Display SVC prediction
+            with col1:
+                st.write("**Support Vector Classifier Prediction:**")
+                if svc_predictions == 0:
+                    st.success("Transaction appears legitimate.")
+                else:
+                    st.error("Alert: High fraud probability!")
 
-        # Display GBC prediction
-        with col2:
-            st.write("**Gradient Boosting Classifier Prediction:**")
-            if gb_predictions == 0:
-                st.success("Transaction appears legitimate.")
-            else:
-                st.error("Alert: High fraud probability!")
+            # Display GBC prediction
+            with col2:
+                st.write("**Gradient Boosting Classifier Prediction:**")
+                if gb_predictions == 0:
+                    st.success("Transaction appears legitimate.")
+                else:
+                    st.error("Alert: High fraud probability!")
 
-        # Display RFC prediction
-        with col3:
-            st.write("**Random Forest Classifier Prediction:**")
-            if rf_predictions == 0:
-                st.success("Transaction appears legitimate.")
-            else:
-                st.error("Alert: High fraud probability!")
+            # Display RFC prediction
+            with col3:
+                st.write("**Random Forest Classifier Prediction:**")
+                if rf_predictions == 0:
+                    st.success("Transaction appears legitimate.")
+                else:
+                    st.error("Alert: High fraud probability!")
 
-        # # Combine predictions and determine the majority vote
-        # final_prediction = np.argmax(np.bincount([svc_predictions, gb_predictions, rf_predictions]))
-        #
-        # st.subheader("Final Prediction (Majority Vote)")
-        # if final_prediction == 0:
-        #     st.success("Transaction appears legitimate.")
-        # else:
-        #     st.error("Alert: High fraud probability!")
+            # Combine predictions and determine the majority vote
+            final_predictions = np.argmax(np.array([svc_predictions, gb_predictions, rf_predictions]), axis=0)
 
+            # Display the final prediction outcome for each row
+            for i, pred in enumerate(final_predictions):
+                if pred == 0:
+                    st.success("The majority vote indicates that this transaction appears legitimate.")
+                else:
+                    st.error("Alert: The majority vote indicates a high probability of fraud for this transaction.")
 
+        else:
+            # Append predictions to the DataFrame
+            df['svc_predictions'] = svc_predictions
+            df['gb_predictions'] = gb_predictions
+            df['rf_predictions'] = rf_predictions
 
-        # Display predictions from each model
-        st.subheader("Model Predictions")
-        # Combine predictions and determine the majority vote
-        final_predictions = []
-        for svc_pred, gb_pred, rf_pred in zip(svc_predictions, gb_predictions, rf_predictions):
-            majority_vote = np.argmax(np.bincount([svc_pred, gb_pred, rf_pred]))
-            final_predictions.append(majority_vote)
+            # Determine the majority vote for each transaction
+            final_predictions = [np.argmax(np.bincount([svc_pred, gb_pred, rf_pred]))
+                                 for svc_pred, gb_pred, rf_pred in zip(svc_predictions, gb_predictions, rf_predictions)]
+            df['final_predictions'] = final_predictions
 
-        st.subheader("Final Predictions (Majority Vote)")
-        st.write(final_predictions)
+            # Display the DataFrame with predictions
+            st.write(df)
 
-        # Display the final prediction outcome for each row
-        for i, pred in enumerate(final_predictions):
-            if pred == 0:
-                st.success(f"Transaction {i + 1}: The model predicts that this transaction is unlikely to be fraudulent.")
-            else:
-                st.error(f"Transaction {i + 1}: The analysis indicates a high probability of fraud for this transaction.")
+            # Provide a download link for the DataFrame with predictions
+            csv = df.to_csv(index=False).encode('utf-8')
+            st.download_button(
+                label="Export",
+                data=csv,
+                file_name='predictions.csv',
+                mime='text/csv',
+            )
 
 
     else:
         st.write("Please upload your data in the 'Data Upload' tab.")
 
-# # Content for Tab 5 - Insights and Actions
-# with tab5:
-#     st.header("Insights and Actions")
-#     st.write("Generate and view detailed reports based on your data.")
-#
-#     if 'uploaded_data' in st.session_state:
-#         df = st.session_state['uploaded_data']
-#         # Example report (you can replace this with your actual report logic)
-#         st.write("Summary Statistics:")
-#         st.write(df.describe())
-#     else:
-#         st.write("Please upload your data in the 'Data Upload' tab.")
+
+# Content for Tab 5 - Insights and Actions
+with tab5:
+    st.header("Insights and Actions")
+    st.write("Generate and view detailed reports based on your data.")
+
+    if 'uploaded_data' in st.session_state:
+        df = st.session_state['uploaded_data']
+        # Example report (you can replace this with your actual report logic)
+        st.write("**Summary Statistics**")
+        st.write(df.describe())
+    else:
+        st.write("Please upload your data in the 'Data Upload' tab.")
