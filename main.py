@@ -390,8 +390,12 @@ with tab6:
 
     # Load the results DataFrame from the CSV file
     results_df = pd.read_csv('results_original.csv')
+    efficiency_df = pd.read_csv('Computational Efficiency.csv')
+
 
     st.write(results_df)
+    st.write(efficiency_df)
+
 
     # Abbreviations for model names
     abbreviation_mapping = {
@@ -402,6 +406,8 @@ with tab6:
 
     # Replace model names with abbreviations
     results_df['Model'] = results_df['Model'].map(abbreviation_mapping)
+    efficiency_df['Model'] = efficiency_df['Model'].map(abbreviation_mapping)
+
 
     # Train and Test Accuracy plot
     with st.expander("Train and Test Accuracy"):
@@ -462,15 +468,53 @@ with tab6:
         ax.set_xticklabels(results_df['Model'], rotation=0)
         st.pyplot(fig)
 
-    
-    # Training and Testing Time plot
-    with st.expander("Training and Testing Time"):
+    # Training Time, Testing Time, and Inference Time plot
+    with st.expander("Training Time, Testing Time, and Inference Time"):
         fig, ax = plt.subplots(figsize=(10, 6))
-        results_df[['Model', 'Training Time', 'Testing Time']].set_index('Model').plot(kind='bar', ax=ax)
-        ax.set_ylabel('Time (seconds)')
-        ax.set_title('Training and Testing Time')
-        ax.legend(['Training Time', 'Testing Time'])
+        efficiency_df[['Model', 'Training Time (s)', 'Testing Time (s)', 'Inference Time per Sample (ms)']].set_index('Model').plot(kind='bar', ax=ax)
+        ax.set_ylabel('Time')
+        ax.set_title('Training Time, Testing Time, and Inference Time')
+        ax.legend(['Training Time', 'Testing Time', 'Inference Time'])
+        ax.set_xticklabels(efficiency_df['Model'], rotation=0)  # Adjust the rotation angle as needed
         st.pyplot(fig)
+
+    # Plot for Memory Usage
+    with st.expander("Memory Usage"):
+        fig, ax = plt.subplots(figsize=(10, 6))
+        ax.bar(efficiency_df['Model'], efficiency_df['Memory Usage (bytes)'])
+        ax.set_xlabel('Model')
+        ax.set_ylabel('Memory Usage (bytes)')
+        ax.set_title('Memory Usage')
+        ax.set_xticklabels(efficiency_df['Model'], rotation=0)
+        st.pyplot(fig)
+
+    # Plot for CPU Usage
+    with st.expander("CPU Usage"):
+        fig, ax = plt.subplots(figsize=(10, 6))
+        ax.bar(efficiency_df['Model'], efficiency_df['CPU Usage (%)'])
+        ax.set_xlabel('Model')
+        ax.set_ylabel('CPU Usage (%)')
+        ax.set_title('CPU Usage')
+        ax.set_xticklabels(efficiency_df['Model'], rotation=0)
+        st.pyplot(fig)
+
+    # Plot for Disk I/O
+    with st.expander("Disk I/O"):
+        fig, ax = plt.subplots(figsize=(10, 6))
+        disk_io_read = efficiency_df['Disk I/O (Read bytes/Write bytes)'].apply(lambda x: int(x.split('/')[0].replace(' bytes', '').strip()))
+        disk_io_write = efficiency_df['Disk I/O (Read bytes/Write bytes)'].apply(lambda x: int(x.split('/')[1].replace(' bytes', '').strip()))
+        bar_width = 0.35
+        index = np.arange(len(efficiency_df))
+        ax.bar(index, disk_io_read, bar_width, label='Read bytes')
+        ax.bar(index + bar_width, disk_io_write, bar_width, label='Write bytes')
+        ax.set_xlabel('Model')
+        ax.set_ylabel('Disk I/O (bytes)')
+        ax.set_title('Disk I/O')
+        ax.set_xticks(index + bar_width / 2)
+        ax.set_xticklabels(efficiency_df['Model'], rotation=0)
+        ax.legend()
+        st.pyplot(fig)
+
 
 
 # Content for Tab 7 - Dashboard and Report
