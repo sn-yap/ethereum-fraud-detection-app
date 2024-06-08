@@ -463,14 +463,20 @@ with tab6:
         st.pyplot(fig)
 
     
-    # Trainigng Time, Testing Time, and Inference Time per Sample plot
-    with st.expander("Trainigng Time, Testing Time, and Inference Time per Sample"):
+    # Training Time, Testing Time, and Inference Time per Sample plot
+    with st.expander("Training Time, Testing Time, and Inference Time per Sample"):
         fig, ax = plt.subplots(figsize=(10, 6))
-        results_df[['Model', 'Training Time', 'Testing Time', 'Inference Time per Sample']].set_index('Model').plot(kind='bar', ax=ax)
-        ax.set_ylabel('Time (s)')
-        ax.set_title('Trainigng Time, Testing Time, and Inference Time per Sample')
-        ax.legend(['Training Time', 'Testing Time', 'Inference Time per Sample'])
-        ax.set_xticklabels(results_df['Model'], rotation=0)  # Adjust the rotation angle as needed
+        bar_width = 0.15
+        metrics = ['Training Time', 'Testing Time', 'Inference Time per Sample']
+        for i, metric in enumerate(metrics):
+            x = np.arange(len(results_df))
+            ax.bar(x + i * bar_width, results_df[metric], width=bar_width, label=metric)
+        ax.set_xlabel('Model')
+        ax.set_ylabel('Score')
+        ax.set_title('Training Time, Testing Time, and Inference Time per Sample')
+        ax.set_xticks(np.arange(len(results_df)) + bar_width * (len(metrics) - 1) / 2)
+        ax.set_xticklabels(results_df['Model'])
+        ax.legend()
         st.pyplot(fig)
 
 # Content for Tab 7 - Dashboard and Report
