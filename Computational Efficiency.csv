@@ -1,0 +1,4 @@
+Model ranking based on Training Time,Model,Training Time (s),Testing Time (s),Memory Usage (bytes),CPU Usage (%),Disk I/O (Read bytes/Write bytes),Inference Time per Sample (ms),Model Size (KB)
+2,Support Vector Classifier,2.809477,0.348049,599341,69.1,0/106496 bytes,0.399,312.62
+3,Gradient Boosting Classifier,1.404514,0.015738,539442,96.2,0/0 bytes,0.018,332.495
+1,Random Forest Classifier,8.13735,0.418413,379277,98.4,0/81920 bytes,0.48,9860.399
