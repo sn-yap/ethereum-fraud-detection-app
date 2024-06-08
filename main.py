@@ -463,21 +463,16 @@ with tab6:
         st.pyplot(fig)
 
     
-    # Training Time, Testing Time, and Inference Time per Sample plot
-    with st.expander("Training Time, Testing Time, and Inference Time per Sample"):
+    # Training and Testing Time plot
+    with st.expander("Training and Testing Time"):
         fig, ax = plt.subplots(figsize=(10, 6))
-        bar_width = 0.15
-        metrics = ['Training Time', 'Testing Time', 'Inference Time per Sample']
-        for i, metric in enumerate(metrics):
-            x = np.arange(len(results_df))
-            ax.bar(x + i * bar_width, results_df[metric], width=bar_width, label=metric)
-        ax.set_xlabel('Model')
-        ax.set_ylabel('Score')
-        ax.set_title('Training Time, Testing Time, and Inference Time per Sample')
-        ax.set_xticks(np.arange(len(results_df)) + bar_width * (len(metrics) - 1) / 2)
-        ax.set_xticklabels(results_df['Model'])
-        ax.legend()
+        results_df[['Model', 'Training Time', 'Testing Time']].set_index('Model').plot(kind='bar', ax=ax)
+        ax.set_ylabel('Time')
+        ax.set_title('Training and Testing Time')
+        ax.legend(['Training Time', 'Testing Time'])
+        ax.set_xticklabels(results_df['Model'], rotation=0)  # Adjust the rotation angle as needed
         st.pyplot(fig)
+
 
 # Content for Tab 7 - Dashboard and Report
 with tab7:
