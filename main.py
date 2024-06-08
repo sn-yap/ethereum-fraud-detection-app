@@ -467,10 +467,9 @@ with tab6:
     with st.expander("Training and Testing Time"):
         fig, ax = plt.subplots(figsize=(10, 6))
         results_df[['Model', 'Training Time', 'Testing Time']].set_index('Model').plot(kind='bar', ax=ax)
-        ax.set_ylabel('Time')
+        ax.set_ylabel('Time (seconds)')
         ax.set_title('Training and Testing Time')
         ax.legend(['Training Time', 'Testing Time'])
-        ax.set_xticklabels(results_df['Model'], rotation=0)  # Adjust the rotation angle as needed
         st.pyplot(fig)
 
 
