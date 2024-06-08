@@ -22,8 +22,8 @@ st.title(
 
 
 # Define the tabs
-tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs(
-    ["Home", "Data Upload", "Data Preprocessing", "Fraud Prediction", "Insights and Actions", "Model Performance"])
+tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs(
+    ["Home", "Data Upload", "Data Preprocessing", "Fraud Prediction", "Insights and Actions", "Model Performance", "Dashboard and Report"])
 
 
 # Content for Tab 1 - Home
@@ -460,3 +460,11 @@ with tab6:
         ax.set_title('ROC AUC')
         ax.set_xticklabels(results_df['Model'], rotation=0)
         st.pyplot(fig)
+
+# Content for Tab 7 - Dashboard and Report
+with tab7:
+    st.header("Dashboard and Report")
+    st.write("Generate and view detailed reports based on your data.")
+
+    # Embed the Power BI dashboard
+    st.components.v1.iframe(src = "https://app.powerbi.com/view?r=eyJrIjoiYzc0YjIwYmItODdlMy00YWE5LTg2YTktNTE3NTczMjUwMTQxIiwidCI6ImE2M2JiMWE5LTQ4YzItNDQ4Yi04NjkzLTMzMTdiMDBjYTdmYiIsImMiOjEwfQ%3D%3D", width = 705, height = 486)
